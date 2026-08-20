@@ -29,7 +29,7 @@
 interactionsByRegions <- function(interactions, regions, chr = NULL, start = NULL, end = NULL, invert = FALSE) {
     if (is(regions, "GRanges")) {
         regions_name <- deparse(substitute(regions))
-        regionsGR <- regions
+        regionsGR <- unname(regions)
     } else if (is.character(regions)) {
         regions_name <- regions
 
@@ -58,12 +58,12 @@ interactionsByRegions <- function(interactions, regions, chr = NULL, start = NUL
         interactions_regions <- unique(IRanges::subsetByOverlaps(interactions, regionsGR, invert = invert))
 
         if (length(interactions_regions) != length(interactions)) {
-            anchor1 <- suppressWarnings(unique(IRanges::mergeByOverlaps(GenomicInteractions::anchorOne(interactions), regionsGR)))
+            anchor1 <- suppressWarnings(unique(IRanges::mergeByOverlaps(unname(GenomicInteractions::anchorOne(interactions)), regionsGR)))
             anchor1$intersect <- suppressWarnings(S4Vectors::width(IRanges::pintersect(anchor1[, 1], anchor1$regionsGR)))
             if (nrow(anchor1) != 0) {
                 anchor1$B.id <- unlist(anchor1$B.id)
             }
-            anchor2 <- suppressWarnings(unique(IRanges::mergeByOverlaps(GenomicInteractions::anchorTwo(interactions), regionsGR)))
+            anchor2 <- suppressWarnings(unique(IRanges::mergeByOverlaps(unname(GenomicInteractions::anchorTwo(interactions)), regionsGR)))
             anchor2$intersect <- suppressWarnings(S4Vectors::width(IRanges::pintersect(anchor2[, 1], anchor2$regionsGR)))
             if (nrow(anchor2) != 0) {
                 anchor2$B.id <- unlist(anchor2$B.id)
@@ -89,7 +89,7 @@ interactionsByRegions <- function(interactions, regions, chr = NULL, start = NUL
         interactions_regions <- unique(IRanges::subsetByOverlaps(interactions, regionsGR, invert = invert))
 
         if (length(interactions_regions) != 0) {
-            anchor1 <- suppressWarnings(unique(IRanges::mergeByOverlaps(GenomicInteractions::anchorOne(interactions), regionsGR)))
+            anchor1 <- suppressWarnings(unique(IRanges::mergeByOverlaps(unname(GenomicInteractions::anchorOne(interactions)), regionsGR)))
             anchor1$intersect <- suppressWarnings(S4Vectors::width(IRanges::pintersect(anchor1[, 1], anchor1[, "regionsGR"])))
             if (nrow(anchor1) != 0) {
                 anchor1$B.id <- unlist(anchor1$B.id)
@@ -107,7 +107,7 @@ interactionsByRegions <- function(interactions, regions, chr = NULL, start = NUL
             m1 <- merge(S4Vectors::elementMetadata(interactions_regions), df1, all = TRUE)
 
 
-            anchor2 <- suppressWarnings(unique(IRanges::mergeByOverlaps(GenomicInteractions::anchorTwo(interactions), regionsGR)))
+            anchor2 <- suppressWarnings(unique(IRanges::mergeByOverlaps(unname(GenomicInteractions::anchorTwo(interactions)), regionsGR)))
             anchor2$intersect <- suppressWarnings(S4Vectors::width(IRanges::pintersect(anchor2[, 1], anchor2[, "regionsGR"])))
             if (nrow(anchor2) != 0) {
                 anchor2$B.id <- unlist(anchor2$B.id)
