@@ -89,7 +89,7 @@ load_interactions <- function(file, sep = "\t", ...) {
         if (!grepl(":", data[1, 1])) {
             format <- "washU"
         } else if (grepl(":", data[1, 1])) {
-            format <- "washU_old"
+            format <- "washUold"
         } else {
             stop("File has the number of columns of a washU file but not the proper format")
         }
