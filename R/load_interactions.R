@@ -156,9 +156,9 @@ load_interactions <- function(file, sep = "\t", ...) {
 }
 
 .process_seqmonk <- function(data) {
+    score_names <- "CS"
     new_datadd <- .process_data(data, score_names)
-
-    data$rownames <- seq_len(nrow(data))
+    return(new_datadd)
 }
 
 .process_washU <- function(data) {
