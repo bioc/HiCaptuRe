@@ -500,6 +500,9 @@ The exported file can be written in the following formats:
 
 - `bedpe`: Standard BEDPE format compatible with many genomic tools
 
+- `biginteract`: BED5+13 format from [UCSC](https://genome.ucsc.edu/goldenpath/help/interact.html)
+
+
 ```{r, export, eval=F}
 export_interactions(
     interactions = ibed1_annotated,
