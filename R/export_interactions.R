@@ -27,7 +27,7 @@
 #'
 #' @export
 export_interactions <- function(interactions, file, format = "ibed", over.write = FALSE, cutoff = 5, parameters = FALSE) {
-    format <- match.arg(arg = format, choices = c("ibed", "peakmatrix", "washU", "washUold", "cytoscape", "bedpe", "seqmonk"), several.ok = FALSE)
+    format <- match.arg(arg = format, choices = c("ibed", "peakmatrix", "washU", "washUold", "cytoscape", "bedpe", "seqmonk", "biginteract"), several.ok = FALSE)
     if (file.exists(file) & !over.write) {
         stop("File already exists. Use `over.write = TRUE` to overwrite.")
     }
