@@ -4,7 +4,7 @@
 #'
 #' @param interactions GenomicInteractions object from \code{\link{load_interactions}}
 #' @param file full path to desired output file (ibed, peakmatrix, washU, washUold, cytoscape, bedpe)
-#' @param format type of output format (ibed, peakmatrix, washU, washUold, cytoscape, bedpe, seqmonk)
+#' @param format type of output format (ibed, peakmatrix, washU, washUold, cytoscape, bedpe, seqmonk, biginteract)
 #' @param over.write TRUE/FALSE to over write the output file
 #' @param cutoff Chicago score cutoff to export interactions
 #' @param parameters TRUE/FALSE to also export the parameters of the given object
@@ -90,7 +90,8 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
         washUold = .export_washUold,
         cytoscape = .export_citoscape,
         bedpe = .export_bedpe,
-        seqmonk = .export_seqmonk
+        seqmonk = .export_seqmonk,
+        biginteract = .export_biginteract
     )
 }
 
@@ -169,6 +170,30 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
     )]
 
     data.table::fwrite(int_df, file = file, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
+}
+
+.export_biginteract <- function(ints, file) {
+  if (.export_empty_if_zero(ints, file)) {
+    return(invisible(NULL))
+  }
+  file <- paste0(file,".bed")
+  cis <- GenomicInteractions::is.cis(ints)
+  GenomeInfoDb::seqlevelsStyle(ints) <- "UCSC"
+  int_df <- dplyr::as_tibble(ints) |>
+    mutate(name = seq_len(n()),
+           exp = ".",
+           color = "#000000",
+           start = ifelse(cis, pmin(start1, start2), start1),
+           end = ifelse(cis, pmax(end1, end2), end1))
+
+  int_df <- int_df[,c("seqnames1", "start", "end", "name", "reads", "CS", "exp", "color",
+                      "seqnames1", "start1", "end1", "ID_1", "strand1",
+                      "seqnames2", "start2", "end2", "ID_2", "strand2")]
+
+  track_header <- 'track type=interact name="Interactions" description="Exported from HiCaptuRe" visibility=full endsVisible=two detailsBoxesEnabled=false'
+
+  writeLines(track_header, con = file)
+  data.table::fwrite(int_df, file = file, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t", append = T)
 }
 
 .export_citoscape <- function(ints, file) {
