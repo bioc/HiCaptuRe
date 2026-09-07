@@ -18,7 +18,7 @@ export_interactions(
 
 \item{file}{full path to desired output file (ibed, peakmatrix, washU, washUold, cytoscape, bedpe)}
 
-\item{format}{type of output format (ibed, peakmatrix, washU, washUold, cytoscape, bedpe, seqmonk)}
+\item{format}{type of output format (ibed, peakmatrix, washU, washUold, cytoscape, bedpe, seqmonk, biginteract)}
 
 \item{over.write}{TRUE/FALSE to over write the output file}
 
