@@ -45,7 +45,7 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
         CS_m <- m[, grep("CS_", names(m))]
         interactions <- interactions[apply(CS_m, 1, function(x) any(x >= cutoff))]
 
-        int_df <- dplyr::as_tibble(interactions)
+        int_df <- as.data.frame(interactions) |> dplyr::as_tibble()
 
         int_df <- int_df[, c(
             "seqnames1", "start1", "end1", "ID_1", "bait_1",
@@ -119,11 +119,10 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
     if (.export_empty_if_zero(ints, file)) {
         return(invisible(NULL))
     }
-    int_df <- dplyr::as_tibble(ints)[, c(
-        "seqnames1", "start1", "end1", "bait_1",
-        "seqnames2", "start2", "end2", "bait_2",
-        "reads", "CS"
-    )]
+    int_df <- as.data.frame(ints) |> dplyr::as_tibble() |>
+        dplyr::select("seqnames1", "start1", "end1", "bait_1",
+                      "seqnames2", "start2", "end2", "bait_2",
+                      "reads", "CS")
     colnames(int_df) <- .IBED_COLS
     data.table::fwrite(int_df, file = file, col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 }
@@ -133,7 +132,7 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
         return(invisible(NULL))
     }
     GenomeInfoDb::seqlevelsStyle(ints) <- "UCSC"
-    int_df <- dplyr::as_tibble(ints)
+    int_df <- as.data.frame(ints) |> dplyr::as_tibble()
     int_df <- dplyr::arrange(int_df, seqnames1, start1, end1, seqnames2, start2, end2)
     washU <- data.frame(
         paste(int_df$seqnames1, int_df$start1, int_df$end1, sep = "\t"),
@@ -163,37 +162,36 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
         return(invisible(NULL))
     }
     ints$name <- seq_len(length(ints))
-    int_df <- dplyr::as_tibble(ints)[, c(
-        "seqnames1", "start1", "end1",
-        "seqnames2", "start2", "end2",
-        "name", "CS", "strand1", "strand2"
-    )]
+    int_df <- as.data.frame(ints) |> dplyr::as_tibble() |>
+        dplyr::select("seqnames1", "start1", "end1",
+                      "seqnames2", "start2", "end2",
+                      "name", "CS", "strand1", "strand2")
 
     data.table::fwrite(int_df, file = file, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
 }
 
 .export_biginteract <- function(ints, file) {
-  if (.export_empty_if_zero(ints, file)) {
-    return(invisible(NULL))
-  }
-  file <- paste0(file,".bed")
-  cis <- GenomicInteractions::is.cis(ints)
-  GenomeInfoDb::seqlevelsStyle(ints) <- "UCSC"
-  int_df <- dplyr::as_tibble(ints) |>
-    mutate(name = seq_len(n()),
-           exp = ".",
-           color = "#000000",
-           start = ifelse(cis, pmin(start1, start2), start1),
-           end = ifelse(cis, pmax(end1, end2), end1))
+    if (.export_empty_if_zero(ints, file)) {
+        return(invisible(NULL))
+    }
+    file <- paste0(file,".bed")
+    cis <- GenomicInteractions::is.cis(ints)
+    GenomeInfoDb::seqlevelsStyle(ints) <- "UCSC"
+    int_df <- as.data.frame(ints) |> dplyr::as_tibble() |>
+        mutate(name = seq_len(n()),
+               exp = ".",
+               color = "#000000",
+               start = ifelse(cis, pmin(start1, start2), start1),
+               end = ifelse(cis, pmax(end1, end2), end1))
 
-  int_df <- int_df[,c("seqnames1", "start", "end", "name", "reads", "CS", "exp", "color",
-                      "seqnames1", "start1", "end1", "ID_1", "strand1",
-                      "seqnames2", "start2", "end2", "ID_2", "strand2")]
+    int_df <- int_df[,c("seqnames1", "start", "end", "name", "reads", "CS", "exp", "color",
+                        "seqnames1", "start1", "end1", "ID_1", "strand1",
+                        "seqnames2", "start2", "end2", "ID_2", "strand2")]
 
-  track_header <- 'track type=interact name="Interactions" description="Exported from HiCaptuRe" visibility=full endsVisible=two detailsBoxesEnabled=false'
+    track_header <- 'track type=interact name="Interactions" description="Exported from HiCaptuRe" visibility=full endsVisible=two detailsBoxesEnabled=false'
 
-  writeLines(track_header, con = file)
-  data.table::fwrite(int_df, file = file, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t", append = T)
+    writeLines(track_header, con = file)
+    data.table::fwrite(int_df, file = file, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t", append = TRUE)
 }
 
 .export_citoscape <- function(ints, file) {
@@ -210,15 +208,12 @@ export_interactions <- function(interactions, file, format = "ibed", over.write 
         return(invisible(NULL))
     }
     ints$ID <- seq_len(length(ints))
-    df1 <- dplyr::as_tibble(ints)[, c(
-        "seqnames2", "start2", "end2", "bait_2",
-        "reads", "CS", "ID"
-    )]
-
-    df2 <- dplyr::as_tibble(ints)[, c(
-        "seqnames1", "start1", "end1", "bait_1",
-        "reads", "CS", "ID"
-    )]
+    df1 <- as.data.frame(ints) |> dplyr::as_tibble() |>
+      dplyr::select("seqnames2", "start2", "end2", "bait_2",
+                    "reads", "CS", "ID")
+    df2 <- as.data.frame(ints) |> dplyr::as_tibble() |>
+      dplyr::select("seqnames1", "start1", "end1", "bait_1",
+                    "reads", "CS", "ID")
 
     seqmonk <- dplyr::bind_rows(df1, stats::setNames(df2, names(df1))) |> dplyr::arrange(ID)
     data.table::fwrite(seqmonk[, -ncol(seqmonk)], file = file, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")

@@ -28,21 +28,21 @@ distance_summary <- function(interactions, breaks = seq(0, 10^6, 10^5), sample =
         stop("The interactions should have a 'int' column")
     }
 
-    total <- dplyr::as_tibble(interactions) |>
-        select(distance, int) |>
+    total <- as.data.frame(interactions) |> dplyr::as_tibble() |>
+        dplyr::select(distance, int) |>
         dplyr::mutate(breaks = cut(distance, breaks = breaks)) |>
         dplyr::group_by(breaks) |>
         dplyr::reframe(value = n()) |>
         tibble::add_column(int = "Total", total_per_int = NA, sample = sample)
 
-    per_int <- dplyr::as_tibble(interactions) |>
-        select(distance, int) |>
+    per_int <- as.data.frame(interactions) |> dplyr::as_tibble() |>
+        dplyr::select(distance, int) |>
         dplyr::mutate(breaks = cut(distance, breaks = breaks)) |>
         dplyr::group_by(int, breaks) |>
         dplyr::reframe(value = n())
 
-    total_int <- dplyr::as_tibble(interactions) |>
-        select(distance, int) |>
+    total_int <- as.data.frame(interactions) |> dplyr::as_tibble() |>
+        dplyr::select(distance, int) |>
         dplyr::group_by(int) |>
         dplyr::reframe(total_per_int = n(), sample = sample)
     per_int_df <- dplyr::full_join(per_int, total_int, by = "int")

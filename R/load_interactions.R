@@ -64,7 +64,7 @@ load_interactions <- function(file, sep = "\t", ...) {
 
 .detect_format <- function(data) {
     if (ncol(data) > 11) {
-        if (all(.PEAKMATRIX_COLS == (colnames(data)[1:11]))) {
+        if (all(.PEAKMATRIX_COLS == (colnames(data)[seq_len(11)]))) {
             format <- "peakmatrix"
         } else {
             stop_message2 <- paste("File has the number of columns of a peakmatrix file but not the correct columns names. Peakmatrix files col.names should be:", paste(.PEAKMATRIX_COLS, collapse = " "))
@@ -73,14 +73,14 @@ load_interactions <- function(file, sep = "\t", ...) {
     } else if (ncol(data) == 10) {
         if (all(colnames(data) == .IBED_COLS)) {
             format <- "ibed"
-        } else if (all(colnames(data) == paste0("V", 1:10))) {
+        } else if (all(colnames(data) == paste0("V", seq_len(10)))) {
             format <- "bedpe"
         } else {
             stop_message3 <- paste("File has the number of columns of an ibed file or a bedpe file but not the correct columns names. Bedpe files should not have header, and ibed files col.names should be:", paste(.IBED_COLS, collapse = " "))
             stop(stop_message3)
         }
     } else if (ncol(data) == 6) {
-        if (all(colnames(data) == paste0("V", 1:6))) {
+        if (all(colnames(data) == paste0("V", seq_len(6)))) {
             format <- "seqmonk"
         } else {
             stop("File has the number of columns of a seqmonk file but should not have header")
@@ -308,7 +308,7 @@ load_interactions <- function(file, sep = "\t", ...) {
     InteractionSet::anchorIds(gi, type = "first")[cond] <- a2
     InteractionSet::anchorIds(gi, type = "second")[cond] <- a1
 
-    cols <- sort(grep("_", colnames(S4Vectors::elementMetadata(gi[cond]))[1:4], value = TRUE))
+    cols <- sort(grep("_", colnames(S4Vectors::elementMetadata(gi[cond]))[seq_len(4)], value = TRUE))
     S4Vectors::elementMetadata(gi[cond])[cols] <- S4Vectors::elementMetadata(gi[cond])[cols[c(rbind(seq(2, length(cols), 2), seq(1, length(cols), 2)))]]
 
     return(gi)

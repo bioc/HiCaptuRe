@@ -30,7 +30,7 @@ interactionsByBaits <- function(interactions, baits, sep = ",", invert = FALSE) 
         warning("There is no interaction by given bait(s). Could Interactions be annotated with a different bait nomenclature?")
         baits_final <- tibble(fragmentID = NA, bait = baits, N_int = NA, NOE = NA, interactingID = NA, interactingAnnotation = NA, interactingDistance = NA)
     } else {
-        baits_df <- dplyr::as_tibble(interactions_baits) |>
+        baits_df <- as.data.frame(interactions_baits) |> dplyr::as_tibble |>
             tidyr::separate_rows(bait_1, sep = sep) |>
             tidyr::separate_rows(bait_2, sep = sep)
 
