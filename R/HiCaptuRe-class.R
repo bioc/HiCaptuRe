@@ -95,3 +95,9 @@ setMethod("show", "HiCaptuRe", function(object) {
         }
     }
 })
+
+#' @export
+setMethod("as.data.frame", signature(x = "HiCaptuRe"),
+          function(x, row.names = NULL, optional = FALSE, ...) {
+            as.data.frame(as(x, "GInteractions"), row.names = row.names, optional = optional, ...)
+          })
